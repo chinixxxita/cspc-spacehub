@@ -1,62 +1,76 @@
 <section class="landing-page">
-  <nav class="landing-nav">
+  <nav class="landing-nav" aria-label="Main navigation">
     <a href="/" class="landing-brand" aria-label="CSPC SpaceHub home">
-      <span><strong>CSPC SpaceHub</strong><small>Room & Laboratory Reservation System</small></span>
+      <span class="brand-mark" aria-hidden="true">SH</span>
+      <span><strong>CSPC SpaceHub</strong><small>Campus-wide room &amp; laboratory reservations</small></span>
     </a>
-    <a class="landing-login" href="/login">Log In</a>
+    <div class="landing-nav-actions">
+      <a class="landing-nav-link" href="#how-it-works">How it works</a>
+      <a class="landing-login" href="/login">Log In <span aria-hidden="true">→</span></a>
+    </div>
   </nav>
 
   <div class="landing-hero">
-    <div class="hero-overlay"></div>
-
+    <div class="hero-overlay" aria-hidden="true"></div>
     <div class="hero-content" data-motion="landing-hero">
-      <div class="landing-eyebrow">CSPC COLLEGE OF COMPUTER STUDIES</div>
-      <h1>Your campus.<br><em>Your space.</em></h1>
-      <p>Find a facility, check availability, and submit a reservation request through one simple campus system.</p>
+      <div class="landing-eyebrow"><span class="eyebrow-dot"></span> CAMARINES SUR POLYTECHNIC COLLEGES</div>
+      <h1>Find your place<br>to <em>make things happen.</em></h1>
+      <p>One convenient place to discover campus rooms and laboratories, check schedules, and request the space your class, organization, or activity needs.</p>
       <div class="hero-actions">
-        <a class="hero-primary" href="/login">Make a Reservation</a>
-        <a class="hero-secondary" href="/login">Check Availability</a>
+        <a class="hero-primary" href="/login">Explore &amp; reserve a space <span aria-hidden="true">→</span></a>
+        <a class="hero-secondary" href="/login">View facility schedules</a>
       </div>
-      <div class="hero-note">Designed for CSPC-CCS students, faculty, and instructors.</div>
+      <div class="hero-note"><span aria-hidden="true">✓</span> For CSPC students, faculty, staff, and authorized campus users</div>
     </div>
 
-    <aside class="availability-card" data-motion="landing-panel" aria-label="SpaceHub overview">
+    <aside class="availability-card" data-motion="landing-panel" aria-label="What you can do with SpaceHub">
       <div class="availability-top">
         <div>
-          <span class="mini-label">SPACEHUB</span>
-          <h2>Reserve with confidence.</h2>
+          <span class="mini-label">CAMPUS SPACE, SIMPLIFIED</span>
+          <h2>Everything starts in one place.</h2>
         </div>
-        <span class="date-chip">2026</span>
+        <span class="card-mark" aria-hidden="true">SH</span>
       </div>
-
       <div class="landing-capabilities">
         <div class="landing-capability">
-          <strong>Rooms</strong>
-          <span>Classrooms for academic and approved student activities.</span>
+          <span class="capability-icon" aria-hidden="true">⌕</span>
+          <div><strong>Discover facilities</strong><span>Browse rooms and laboratories across participating campus units.</span></div>
         </div>
         <div class="landing-capability">
-          <strong>Laboratories</strong>
-          <span>Instructor-led computer facilities for classes and technical activities.</span>
+          <span class="capability-icon" aria-hidden="true">▦</span>
+          <div><strong>Check schedules</strong><span>Review facility calendars before sending a request.</span></div>
         </div>
         <div class="landing-capability">
-          <strong>Live schedule</strong>
-          <span>Check pending, booked, and maintenance periods before requesting.</span>
+          <span class="capability-icon" aria-hidden="true">✓</span>
+          <div><strong>Track your requests</strong><span>Keep reservation updates and decisions together.</span></div>
         </div>
       </div>
-
       <% if (rooms && rooms.length) { %>
         <div class="landing-availability">
-          <span class="mini-label">AVAILABLE FACILITIES</span>
+          <div class="availability-heading"><span class="mini-label">AVAILABLE FACILITIES</span><a href="/login">View all <span aria-hidden="true">→</span></a></div>
           <% rooms.slice(0, 3).forEach(room => { %>
             <div class="landing-room">
               <span><strong><%= room.name %></strong><small><%= room.type %> · <%= room.capacity %> seats</small></span>
-              <b>Available</b>
+              <b><span aria-hidden="true">●</span> Available</b>
             </div>
           <% }) %>
         </div>
       <% } %>
     </aside>
-
-    <div class="landing-bottom-note">Simple. Professional. Built for campus space management.</div>
+    <div class="landing-bottom-note"><span>SPACEHUB</span> &nbsp;·&nbsp; A more connected campus experience</div>
   </div>
+
+  <section class="landing-how" id="how-it-works">
+    <div class="landing-section-intro">
+      <span class="landing-section-kicker">A SIMPLE CAMPUS WORKFLOW</span>
+      <h2>Less back-and-forth.<br><em>More time for what matters.</em></h2>
+      <p>SpaceHub brings facility discovery and reservation updates into a clear, guided experience.</p>
+    </div>
+    <div class="landing-steps">
+      <article class="landing-step"><span class="step-number">01</span><div><h3>Find a facility</h3><p>Browse available rooms and laboratories and review their details.</p></div></article>
+      <article class="landing-step"><span class="step-number">02</span><div><h3>Choose a schedule</h3><p>Check the calendar and select a time that fits your activity.</p></div></article>
+      <article class="landing-step"><span class="step-number">03</span><div><h3>Send &amp; follow up</h3><p>Submit your request and monitor its status from your account.</p></div></article>
+    </div>
+  </section>
+  <footer class="landing-footer"><span><strong>CSPC SpaceHub</strong> · Campus-wide space reservation</span><a href="/login">Log in to get started <span aria-hidden="true">→</span></a></footer>
 </section>
