@@ -1,0 +1,45 @@
+<section class="scan-page">
+  <div class="page-heading"><div>
+    <div class="eyebrow">FACILITY CHECK-IN</div>
+    <h1><%= room.name %></h1>
+    <p><%= [room.college_code, room.type, room.building, room.floor].filter(Boolean).join(' · ') %></p>
+  </div></div>
+
+  <% if (active) { %>
+    <div class="card scan-card">
+      <h2>You are checked in</h2>
+      <p><strong><%= active.reference_no %></strong> · <%= active.st.slice(0,5) %> – <%= active.et.slice(0,5) %></p>
+      <p class="muted">Checked in at <%= active.in_text %>. When you are done and leaving, check out.</p>
+      <form action="/checkin/<%= token %>" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+        <input type="hidden" name="action" value="checkout">
+        <input type="hidden" name="reservation_id" value="<%= active.id %>">
+        <button class="primary full scan-button" type="submit">Check Out</button>
+      </form>
+    </div>
+  <% } else if (ready) { %>
+    <div class="card scan-card">
+      <h2>Ready to check in</h2>
+      <p><strong><%= ready.reference_no %></strong> · <%= ready.st.slice(0,5) %> – <%= ready.et.slice(0,5) %></p>
+      <p class="muted"><%= ready.purpose %></p>
+      <form action="/checkin/<%= token %>" method="post">
+        <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+        <input type="hidden" name="action" value="checkin">
+        <input type="hidden" name="reservation_id" value="<%= ready.id %>">
+        <button class="primary full scan-button" type="submit">Check In</button>
+      </form>
+    </div>
+  <% } else { %>
+    <div class="card scan-card">
+      <h2>Nothing to check in right now</h2>
+      <% if (upcoming) { %>
+        <p>Your reservation <strong><%= upcoming.reference_no %></strong> is today, <%= upcoming.st.slice(0,5) %> – <%= upcoming.et.slice(0,5) %>.</p>
+        <p class="muted"><%= upcomingNote %></p>
+      <% } else { %>
+        <p>You have no approved reservation for <%= room.name %> today.</p>
+        <p class="muted">Check-in opens <%= early %> minutes before your start time. Reservations must be approved first.</p>
+      <% } %>
+      <a class="button-link-dark" href="/reservations/my">My Reservations</a>
+    </div>
+  <% } %>
+</section>

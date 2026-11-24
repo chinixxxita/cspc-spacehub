@@ -1,0 +1,44 @@
+<section>
+  <div class="page-heading"><div><div class="eyebrow">ADMINISTRATION · REQUEST REVIEW</div><h1><%= reservation.reference_no %></h1><p>Review the requester, facility, schedule, and purpose.</p></div><span class="badge <%= reservation.status.toLowerCase() %>"><%= reservation.status %></span></div>
+  <div class="admin-detail-grid">
+    <div class="card">
+      <h2>Reservation Details</h2>
+      <div class="detail-grid">
+        <div><span>Facility</span><strong><%= reservation.room_name %></strong><small><%= reservation.room_type %></small></div>
+        <div><span>Date</span><strong><%= reservation.d %></strong></div>
+        <div><span>Time</span><strong><%= reservation.start_time %> – <%= reservation.end_time %></strong></div>
+        <div><span>Users</span><strong><%= reservation.number_of_users %> / <%= reservation.capacity %></strong></div>
+        <div><span>Purpose</span><strong><%= reservation.purpose %></strong></div>
+        <div><span>Equipment</span><strong><%= reservation.air_conditioned ? 'Air-conditioned' : 'No AC' %></strong><small><%= reservation.has_computers ? reservation.computer_count + ' PCs' : 'No PCs' %></small></div>
+      </div>
+      <div class="detail-block"><span>Purpose Details</span><p><%= reservation.purpose_details %></p></div>
+      <% if (reservation.rejection_reason) { %><div class="rejection-box"><strong>Rejection Reason</strong><p><%= reservation.rejection_reason %></p></div><% } %>
+    </div>
+    <div class="card">
+      <h2>Requester</h2>
+      <div class="requester"><div class="avatar"><%= reservation.full_name.charAt(0).toUpperCase() %></div><div><strong><%= reservation.full_name %></strong><span><%= reservation.role %></span></div></div>
+      <dl class="meta-list"><dt>School ID</dt><dd><%= reservation.school_id %></dd><dt>Email</dt><dd><%= reservation.email %></dd></dl>
+      <% if (['Approved', 'Completed'].includes(reservation.status)) { %>
+        <dl class="meta-list"><dt>Checked in</dt><dd><%= reservation.checked_in_text || '—' %></dd><dt>Checked out</dt><dd><%= reservation.checked_out_text || '—' %></dd></dl>
+      <% } %>
+      <% if (reservation.status === 'Pending') { %>
+        <form action="/admin/requests/<%= reservation.id %>/approve" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="primary full" type="submit">Approve Reservation</button></form>
+        <form action="/admin/requests/<%= reservation.id %>/reject" method="post" class="reject-form"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><label>Rejection Reason *</label><textarea name="rejection_reason" rows="4" required placeholder="Explain why the request cannot be approved."></textarea><button class="danger full" type="submit">Reject Reservation</button></form>
+      <% } else if (reservation.status === 'Approved') { %>
+        <% if (attendance.canCheckIn) { %>
+          <form action="/admin/requests/<%= reservation.id %>/checkin" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="primary full" type="submit">Check In</button></form>
+        <% } else if (attendance.canCheckOut) { %>
+          <div class="notice compact">The group is checked in. Check out when they leave; the reservation will be marked completed.</div>
+          <form action="/admin/requests/<%= reservation.id %>/checkout" method="post" onsubmit="return confirm('Check out and mark this reservation as completed?');"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="primary full" type="submit">Check Out &amp; Complete</button></form>
+        <% } else if (attendance.missed) { %>
+          <div class="notice compact">No check-in was recorded and the scheduled time has ended. You can still mark the reservation completed to close the record.</div>
+        <% } else { %>
+          <div class="notice compact">Check-in opens <%= attendance.earlyMinutes %> minutes before the start time, on the reservation date (<%= reservation.d %>).</div>
+        <% } %>
+        <% if (!attendance.checkedIn) { %>
+          <form action="/admin/requests/<%= reservation.id %>/complete" method="post" onsubmit="return confirm('Mark this reservation as completed?');"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="secondary full" type="submit">Mark as Completed</button></form>
+        <% } %>
+      <% } else { %><div class="notice compact">This reservation is <strong><%= reservation.status %></strong>. No further action is available.</div><% } %>
+    </div>
+  </div>
+</section>

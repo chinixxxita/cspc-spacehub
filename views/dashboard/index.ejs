@@ -1,0 +1,39 @@
+<section>
+  <div class="dashboard-hero">
+    <div class="eyebrow">CSPC SpaceHub</div>
+    <h1>Welcome, <%= currentUser.full_name %></h1>
+    <p>Find a campus space, check availability, and manage your reservations in one place.</p>
+    <div class="hero-actions"><a class="primary" href="/reservations/new">Make Reservation</a><a class="button-link-dark" href="/reservations/my">My Reservations</a></div>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card" data-motion="stat"><span>Pending</span><strong data-count="<%= counts.pending || 0 %>"><%= counts.pending || 0 %></strong></div>
+    <div class="stat-card" data-motion="stat"><span>Approved</span><strong data-count="<%= counts.approved || 0 %>"><%= counts.approved || 0 %></strong></div>
+    <div class="stat-card" data-motion="stat"><span>Rejected</span><strong data-count="<%= counts.rejected || 0 %>"><%= counts.rejected || 0 %></strong></div>
+    <div class="stat-card" data-motion="stat"><span>Completed</span><strong data-count="<%= counts.completed || 0 %>"><%= counts.completed || 0 %></strong></div>
+  </div>
+
+  <div class="card">
+    <div class="card-heading"><div><h2>My Recent Reservations</h2></div><a href="/reservations/my">View all</a></div>
+    <% if (!reservations.length) { %>
+      <div class="empty">You don't have any reservations yet.</div>
+    <% } else { %>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Reference</th><th>Facility</th><th>Date</th><th>Time</th><th>Status</th></tr></thead>
+          <tbody>
+          <% reservations.forEach(r => { %>
+            <tr>
+              <td><strong><%= r.reference_no %></strong></td>
+              <td><%= r.room_name %></td>
+              <td><%= String(r.reservation_date).slice(0,10) %></td>
+              <td><%= r.start_time %> – <%= r.end_time %></td>
+              <td><span class="badge <%= r.status.toLowerCase() %>"><%= r.status %></span></td>
+            </tr>
+          <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </div>
+</section>

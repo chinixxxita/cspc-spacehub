@@ -1,0 +1,97 @@
+<% const t12 = (t) => { const [h, m] = String(t).slice(0,5).split(':').map(Number); return `${h % 12 || 12}:${String(m).padStart(2,'0')} ${h < 12 ? 'AM' : 'PM'}`; }; %>
+<% const roomQs = activeRoom ? `&room=${activeRoom}` : ''; %>
+<section class="calendar-page">
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">SCHEDULE</div>
+      <h1>Calendar</h1>
+      <p><%= isAdminCalendar ? 'Monitor pending and booked reservations across all facilities.' : 'View facility availability, pending requests, booked times, and maintenance periods.' %></p>
+    </div>
+    <% if (!isAdminCalendar) { %>
+      <a class="primary" href="/reservations/new">Make Reservation</a>
+    <% } %>
+  </div>
+
+  <div class="card calendar-card">
+    <div class="calendar-toolbar">
+      <a class="calendar-nav" href="/calendar?month=<%= previousMonth %><%= roomQs %>" aria-label="Previous month">&#8592;</a>
+      <div class="calendar-month-heading">
+        <h2><%= monthName %> <%= year %></h2>
+        <a class="today-link" href="/calendar<%= activeRoom ? '?room=' + activeRoom : '' %>">Today</a>
+      </div>
+      <a class="calendar-nav calendar-nav-next" href="/calendar?month=<%= nextMonth %><%= roomQs %>" aria-label="Next month">&#8594;</a>
+    </div>
+
+    <form class="calendar-filter" method="get" action="/calendar">
+      <input type="hidden" name="month" value="<%= year %>-<%= String(month + 1).padStart(2, '0') %>">
+      <label for="calendarRoom">Facility</label>
+      <select id="calendarRoom" name="room" aria-label="Filter calendar by facility" onchange="this.form.submit()">
+        <option value="">All facilities</option>
+        <% rooms.forEach(r => { %>
+          <option value="<%= r.id %>" <%= activeRoom === r.id ? 'selected' : '' %>><%= r.name %></option>
+        <% }) %>
+      </select>
+      <noscript><button type="submit">Apply</button></noscript>
+    </form>
+
+    <div class="calendar-scroll" role="region" aria-label="Monthly facility calendar" tabindex="0">
+      <div class="calendar-weekdays" aria-hidden="true">
+        <% ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'].forEach(day => { %>
+          <div><%= day %></div>
+        <% }) %>
+      </div>
+
+      <div class="calendar-grid">
+        <% cells.forEach(cell => { %>
+          <% if (cell.blank) { %>
+            <div class="calendar-cell blank" aria-hidden="true"></div>
+          <% } else { %>
+            <div class="calendar-cell <%= cell.date === today ? 'today' : '' %>" <%= cell.date === today ? 'aria-current="date"' : '' %> aria-label="<%= monthName %> <%= cell.day %>, <%= year %>">
+              <div class="day-number"><%= cell.day %></div>
+              <div class="calendar-events">
+              <% (cell.maintenance || []).forEach(m => { %>
+                <div class="calendar-event maintenance" title="<%= m.room_name %> — Maintenance">
+                  <strong>Maintenance</strong>
+                  <span><%= m.room_name %></span>
+                  <small>Unavailable</small>
+                </div>
+              <% }) %>
+
+              <% cell.reservations.forEach(r => { %>
+                <% const statusLabel = r.status === 'Approved' ? 'Booked' : 'Pending'; %>
+                <% const ownReservation = String(r.user_id) === String(currentUserId); %>
+                <% const timeLabel = t12(r.start_time) + '–' + t12(r.end_time); %>
+                <% if (isAdminCalendar) { %>
+                  <a class="calendar-event <%= r.status.toLowerCase() %>" href="/admin/requests/<%= r.id %>" title="<%= r.room_name %> — <%= statusLabel %>">
+                    <strong><%= timeLabel %></strong>
+                    <span><%= r.room_name %></span>
+                    <small><%= statusLabel %></small>
+                  </a>
+                <% } else if (ownReservation) { %>
+                  <a class="calendar-event <%= r.status.toLowerCase() %>" href="/reservations/<%= r.id %>" title="Your reservation — <%= r.room_name %> — <%= statusLabel %>">
+                    <strong><%= timeLabel %></strong>
+                    <span><%= r.room_name %></span>
+                    <small><%= statusLabel %></small>
+                  </a>
+                <% } else { %>
+                  <div class="calendar-event <%= r.status.toLowerCase() %>" title="<%= r.room_name %> — <%= statusLabel %>">
+                    <strong><%= timeLabel %></strong>
+                    <span><%= r.room_name %></span>
+                    <small><%= statusLabel %></small>
+                  </div>
+                <% } %>
+              <% }) %>
+              </div>
+            </div>
+          <% } %>
+        <% }) %>
+      </div>
+    </div>
+
+    <div class="calendar-legend" aria-label="Calendar legend">
+      <span><i class="status-dot pending-dot"></i> Pending</span>
+      <span><i class="status-dot approved-dot"></i> Booked</span>
+      <span><i class="status-dot maintenance-dot"></i> Maintenance</span>
+    </div>
+  </div>
+</section>

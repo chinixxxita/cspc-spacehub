@@ -1,0 +1,68 @@
+<section class="admin-accounts-page">
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">ADMINISTRATION · ACCESS CONTROL</div>
+      <h1>Admin Account Management</h1>
+      <p>Create and review administrator accounts for <strong><%= adminCollege.code %></strong> (<%= adminCollege.name %>). Each college manages its own administrators.</p>
+    </div>
+    <span class="badge active"><%= admins.length %> administrator<%= admins.length === 1 ? '' : 's' %></span>
+  </div>
+
+  <div class="admin-account-layout">
+    <div class="card admin-create-card">
+      <div class="admin-card-heading">
+        <div class="admin-card-icon" aria-hidden="true">+</div>
+        <div><h2>Create an administrator</h2><p>Grant access only to personnel authorized to manage SpaceHub.</p></div>
+      </div>
+      <div class="notice compact">Admin accounts you create here can manage <%= adminCollege.code %> reservations, facilities, maintenance, and user access only. Do not share passwords in public chats.</div>
+      <form action="/admin/admin-accounts" method="post" autocomplete="off" class="admin-account-form"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+        <label>School ID
+          <input type="text" name="school_id" maxlength="30" minlength="2" pattern="[A-Za-z0-9_-]{2,30}" required autocomplete="off" placeholder="e.g. ADMIN002">
+          <small class="field-hint">Use the staff member's unique school or administrator ID.</small>
+        </label>
+        <label>Full name
+          <input type="text" name="full_name" maxlength="150" minlength="2" required autocomplete="name" placeholder="Authorized staff member">
+        </label>
+        <label>Email address
+          <input type="email" name="email" maxlength="150" required autocomplete="off" placeholder="admin@cspc.edu.ph">
+        </label>
+        <label>Temporary password
+          <input type="password" name="password" minlength="12" maxlength="128" required autocomplete="new-password" placeholder="At least 12 characters">
+          <small class="field-hint">Include uppercase and lowercase letters, a number, and a symbol. Share it privately.</small>
+        </label>
+        <button class="primary full admin-create-button" type="submit"><span aria-hidden="true">+</span> Create Admin Account</button>
+      </form>
+    </div>
+
+    <aside class="card admin-security-card">
+      <div class="eyebrow">SECURITY CHECKLIST</div>
+      <h2>Keep admin access secure</h2>
+      <ul>
+        <li><strong>Authorized personnel only</strong><span>Never create admin accounts for ordinary student or faculty access.</span></li>
+        <li><strong>Unique credentials</strong><span>Each administrator should use their own account.</span></li>
+        <li><strong>Private password sharing</strong><span>Send temporary credentials through a secure private channel.</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="card admin-list-card">
+    <div class="card-heading"><div><h2>Existing administrators</h2><p>Review account identity and status.</p></div></div>
+    <div class="table-wrap">
+      <table data-table>
+        <thead><tr><th>Administrator</th><th>School ID</th><th>Email address</th><th>Status</th><th>Created</th></tr></thead>
+        <tbody>
+          <% if (!admins.length) { %><tr><td colspan="5" class="muted center">No administrator accounts found.</td></tr><% } %>
+          <% admins.forEach(admin => { %>
+            <tr>
+              <td><strong><%= admin.full_name %></strong><% if (admin.id === currentUser.id) { %><small class="admin-self-label">Your account</small><% } %></td>
+              <td><%= admin.school_id %></td>
+              <td><%= admin.email %></td>
+              <td><span class="badge <%= admin.status.toLowerCase() %>"><%= admin.status %></span></td>
+              <td><%= formatDay(admin.created_at) %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

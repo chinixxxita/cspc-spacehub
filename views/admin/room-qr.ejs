@@ -1,0 +1,29 @@
+<section class="qr-page">
+  <div class="page-heading no-print">
+    <div>
+      <div class="eyebrow">ADMINISTRATION</div>
+      <h1><%= all ? 'Facility QR Codes' : 'QR Code: ' + items[0].room.name %></h1>
+      <p>Print and post each code inside its room or laboratory. Reservers scan it to check in on arrival and scan again to check out.</p>
+    </div>
+    <div class="heading-actions">
+      <button class="primary" type="button" onclick="window.print()">Print</button>
+      <% if (all) { %><a class="button-link-dark" href="/admin/rooms">Back to Facilities</a><% } else { %><a class="button-link-dark" href="/admin/rooms/qr">All QR Codes</a><a class="button-link-dark" href="/admin/rooms">Back to Facilities</a><% } %>
+    </div>
+  </div>
+  <% if (!usingAppUrl) { %><div class="notice compact no-print">These codes point to the address you used to open this page. Set <code>APP_URL</code> to the site's real address (for example https://your-domain) before printing the final codes.</div><% } %>
+
+  <div class="qr-grid">
+    <% items.forEach(item => { %>
+      <div class="card qr-card">
+        <div class="qr-image"><%- item.svg %></div>
+        <h2><%= item.room.name %></h2>
+        <p class="qr-place"><%= [item.room.type, item.room.building, item.room.floor].filter(Boolean).join(' · ') %></p>
+        <p class="qr-howto"><strong>Scan to check in</strong> when you arrive.<br><strong>Scan again to check out</strong> when you leave.<br>Log in with your SpaceHub account.</p>
+        <p class="qr-url no-print"><small><%= item.url %></small></p>
+        <% if (!all) { %>
+          <form class="no-print" action="/admin/rooms/<%= item.room.id %>/qr/regenerate" method="post" onsubmit="return confirm('Generate a new code? The printed code will stop working immediately.');"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="danger-outline" type="submit">Generate new code</button></form>
+        <% } else { %><a class="no-print" href="/admin/rooms/<%= item.room.id %>/qr">Manage code</a><% } %>
+      </div>
+    <% }) %>
+  </div>
+</section>

@@ -1,0 +1,42 @@
+<section>
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">ACCOUNT</div>
+      <h1>Notifications</h1>
+      <p>Updates about your reservations and account activity.</p>
+    </div>
+    <% if (notifications.some(n => !n.is_read)) { %>
+      <form action="/notifications/read-all" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+        <button class="secondary" type="submit">Mark all as read</button>
+      </form>
+    <% } %>
+  </div>
+
+  <div class="card notification-list">
+    <% if (!notifications.length) { %>
+      <div class="empty">
+        <h3>No notifications</h3>
+        <p>Reservation updates will appear here.</p>
+      </div>
+    <% } else { %>
+      <% notifications.forEach(n => { %>
+        <article class="notification-item <%= n.is_read ? 'read' : 'unread' %>">
+          <div class="notification-icon"><span class="sr-only"><%= n.is_read ? 'Read' : 'Unread' %></span></div>
+          <div class="notification-content">
+            <div class="notification-title-row">
+              <strong><%= n.title %></strong>
+              <% if (!n.is_read) { %><span class="unread-label">NEW</span><% } %>
+            </div>
+            <p><%= n.message %></p>
+            <small><%= formatDateTime(n.created_at) %></small>
+          </div>
+          <% if (!n.is_read) { %>
+            <form action="/notifications/<%= n.id %>/read" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+              <button class="text-button" type="submit">Mark read</button>
+            </form>
+          <% } %>
+        </article>
+      <% }) %>
+    <% } %>
+  </div>
+</section>

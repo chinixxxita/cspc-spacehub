@@ -1,0 +1,32 @@
+<section>
+  <div class="page-heading"><div><div class="eyebrow">ACCOUNT</div><h1>My Profile</h1><p>Keep your SpaceHub account information up to date.</p></div><a class="button-link-dark" href="/security">Security</a></div>
+  <div class="profile-grid">
+    <div class="card profile-summary">
+      <div class="avatar-large"><%= profile.full_name.split(" ").map(n => n[0]).slice(0,2).join("").toUpperCase() %></div>
+      <h2><%= profile.full_name %></h2><p><%= profile.email %></p>
+      <span class="badge approved"><%= profile.role %></span>
+      <div class="profile-meta"><div><span>School ID</span><strong><%= profile.school_id %></strong></div><div><span>Status</span><strong><%= profile.status %></strong></div><% if (profile.college_code) { %><div class="meta-wide"><span>College</span><strong><%= profile.college_code %> — <%= profile.college_name %></strong></div><% } %></div>
+    </div>
+    <form class="card form-card" action="/profile" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <h2>Personal Information</h2>
+      <label>Full Name *</label><input name="full_name" value="<%= profile.full_name %>" required>
+      <label>Email *</label><input type="email" name="email" placeholder="name@cspc.edu.ph" value="<%= profile.email %>" required>
+      <% if (profile.role === "admin") { %>
+        <label>College</label><input value="<%= profile.college_code ? profile.college_code + ' — ' + profile.college_name : 'Not assigned' %>" disabled>
+      <% } else { %>
+        <label for="college_id">College *</label>
+        <select id="college_id" name="college_id" required>
+          <option value="">Select your college</option>
+          <% colleges.forEach(c => { %><option value="<%= c.id %>" <%= profile.college_id === c.id ? 'selected' : '' %>><%= c.code %> — <%= c.name %></option><% }) %>
+        </select>
+      <% } %>
+      <% if (profile.role === "student") { %>
+        <div class="two-col"><div><label>Program</label><input name="program" value="<%= profile.program || '' %>" placeholder="BSIT"></div><div><label>Year Level</label><input name="year_level" value="<%= profile.year_level || '' %>" placeholder="2"></div></div>
+        <label>Section</label><input name="section" value="<%= profile.section || '' %>" placeholder="2D">
+      <% } else { %>
+        <div class="two-col"><div><label>Department</label><input name="department" value="<%= profile.department || '' %>"></div><div><label>Position</label><input name="position" value="<%= profile.position || '' %>"></div></div>
+      <% } %>
+      <div class="form-footer"><span class="muted">School ID and account role cannot be changed here.</span><button class="primary">Save Changes</button></div>
+    </form>
+  </div>
+</section>
