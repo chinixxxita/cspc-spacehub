@@ -173,7 +173,7 @@ router.post("/submit", reservationWriteLimiter, async(req,res,next)=>{
     await writeAudit(c, { userId:req.session.user.id, action:"SUBMIT_RESERVATION", entityType:"reservation", entityId:reservationInsert.insertId, details:`Submitted ${referenceNo} for room ${room_id} on ${reservation_date} ${start_time}-${end_time}`, req, collegeId: room.college_id });
 
     // Notify the active administrators of the facility's college (and only them).
-    const [admins] = await c.execute(`SELECT id FROM users WHERE role='admin' AND status='Active' AND college_id=?`, [room.college_id]);
+    const [admins] = await c.execute(`SELECT id FROM users WHERE role='college_admin' AND status='Active' AND college_id=?`, [room.college_id]);
     const [requesterRows] = await c.execute(`SELECT full_name FROM users WHERE id=? LIMIT 1`, [req.session.user.id]);
     const requesterName = requesterRows[0]?.full_name || 'A user';
     const [roomRows] = await c.execute(`SELECT name FROM rooms WHERE id=? LIMIT 1`, [room_id]);
@@ -237,7 +237,7 @@ router.post("/:id/cancel", requireAuth, async (req, res, next) => {
     );
     await writeAudit(connection, { userId:req.session.user.id, action:"CANCEL_RESERVATION", entityType:"reservation", entityId:r.id, details:`Cancelled ${r.reference_no}`, req, collegeId: r.college_id });
     const [admins] = await connection.execute(
-      `SELECT id FROM users WHERE role='admin' AND status='Active' AND college_id=?`,
+      `SELECT id FROM users WHERE role='college_admin' AND status='Active' AND college_id=?`,
       [r.college_id]
     );
     for (const admin of admins) {

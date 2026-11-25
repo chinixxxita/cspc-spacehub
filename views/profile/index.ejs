@@ -11,7 +11,7 @@
       <h2>Personal Information</h2>
       <label>Full Name *</label><input name="full_name" value="<%= profile.full_name %>" required>
       <label>Email *</label><input type="email" name="email" placeholder="name@cspc.edu.ph" value="<%= profile.email %>" required>
-      <% if (profile.role === "admin") { %>
+      <% if (["admin", "college_admin", "system_admin"].includes(profile.role)) { %>
         <label>College</label><input value="<%= profile.college_code ? profile.college_code + ' — ' + profile.college_name : 'Not assigned' %>" disabled>
       <% } else { %>
         <label for="college_id">College *</label>

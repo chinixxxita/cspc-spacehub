@@ -6,52 +6,51 @@ const router = express.Router();
 
 router.get("/dashboard", requireAuth, async (req, res, next) => {
   try {
-    // Dashboard is role-aware: administrators use the same /dashboard entry
-    // point, but see the administrative dashboard content.
-    if (req.session.user.role === "admin") {
-      const [[counts]] = await db.execute(`
-        SELECT
-          SUM(status = 'Pending') AS pending,
-          SUM(status = 'Approved') AS approved,
-          SUM(status = 'Rejected') AS rejected,
-          SUM(status = 'Completed') AS completed,
-          COUNT(*) AS total
-        FROM reservations
-      `);
-      const [[rooms]] = await db.execute(`
-        SELECT COUNT(*) AS total,
-               SUM(type='Room') AS regular_rooms,
-               SUM(type='Laboratory') AS laboratories
-        FROM rooms
-      `);
-      const [[users]] = await db.execute(`
-        SELECT COUNT(*) AS total,
-               SUM(role='student') AS students,
-               SUM(role='faculty') AS faculty
-        FROM users
-        WHERE status='Active'
-      `);
-      const [pending] = await db.execute(`
-        SELECT r.id, r.reference_no, r.reservation_date, r.start_time, r.end_time,
-               r.purpose, r.number_of_users, u.full_name, u.role,
-               rm.name AS room_name, rm.type
-        FROM reservations r
-        JOIN users u ON u.id = r.user_id
-        JOIN rooms rm ON rm.id = r.room_id
-        WHERE r.status = 'Pending'
-        ORDER BY r.created_at ASC
-        LIMIT 8
-      `);
+    const role = req.session.user.role;
 
-      return res.render("admin/dashboard", {
+    // College Admin dashboard is handled by adminDashboardRoutes.
+    if (role === "college_admin") {
+      return res.redirect("/dashboard");
+    }
+
+    // System Admin gets a separate overview.
+    if (role === "system_admin") {
+      const [[colleges]] = await db.execute(
+        "SELECT COUNT(*) AS total FROM colleges"
+      );
+
+      const [[admins]] = await db.execute(
+        `SELECT
+          COUNT(*) AS total,
+          SUM(status = 'Active') AS active
+         FROM users
+         WHERE role = 'college_admin'`
+      );
+
+      const [[users]] = await db.execute(
+        `SELECT COUNT(*) AS total
+         FROM users
+         WHERE role IN ('student', 'faculty')`
+      );
+
+      const [[reservations]] = await db.execute(
+        `SELECT
+          COUNT(*) AS total,
+          SUM(status = 'Pending') AS pending,
+          SUM(status = 'Approved') AS approved
+         FROM reservations`
+      );
+
+      return res.render("system-admin/overview", {
         title: "Dashboard",
-        counts,
-        rooms,
+        colleges,
+        admins,
         users,
-        pending
+        reservations
       });
     }
 
+    // Existing student/faculty dashboard.
     const userId = req.session.user.id;
 
     const [reservations] = await db.execute(

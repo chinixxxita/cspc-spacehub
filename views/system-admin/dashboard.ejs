@@ -1,0 +1,102 @@
+<div class="system-admin-page">
+<div class="page-header">
+  <div>
+    <p class="eyebrow">CAMPUS-WIDE CONTROL</p>
+    <h1>System Administration</h1>
+    <p class="muted">Create and manage the College Administrator account for each CSPC college.</p>
+  </div>
+</div>
+
+<% if (resetResult) { %>
+  <div class="card" style="margin-bottom:1.25rem;border:1px solid #d6a84f" role="status">
+    <div class="card-body">
+      <h2><%= resetResult.notice %></h2>
+      <p><strong><%= resetResult.full_name %></strong> · <%= resetResult.school_id %></p>
+      <p style="font-size:1.1rem"><strong>Temporary password:</strong> <code><%= resetResult.password %></code></p>
+      <p class="muted">Copy this password now. It will not be displayed again.</p>
+    </div>
+  </div>
+<% } %>
+
+<div class="card" style="margin-bottom:1.25rem">
+  <div class="card-body">
+    <h2>College Administrator accounts</h2>
+    <p class="muted">Each college has one designated College Administrator. Accounts are assigned to exactly one college. Deactivated accounts retain their college slot and can be reactivated.</p>
+    <div class="table-responsive system-admin-table-wrap">
+      <table class="table system-admin-table">
+        <thead><tr><th>College</th><th>Administrator</th><th>Account status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <% colleges.forEach(college => { %>
+            <tr>
+              <td><strong><%= college.code %></strong><br><small><%= college.name %></small></td>
+              <td>
+                <% if (college.administrator_id) { %>
+                  <strong><%= college.full_name %></strong><br>
+                  <small><%= college.school_id %> · <%= college.email %></small>
+                  <% if (college.must_change_password) { %><br><small class="muted">Password change required</small><% } %>
+                <% } else { %><span class="muted">No administrator assigned</span><% } %>
+              </td>
+              <td>
+                <% if (college.administrator_id) { %>
+                  <span class="badge <%= college.administrator_status === 'Active' ? 'approved' : 'cancelled' %>"><%= college.administrator_status %></span>
+                <% } else { %><span class="muted">—</span><% } %>
+              </td>
+              <td>
+                <% if (!college.administrator_id) { %>
+                  <details>
+                    <summary class="button-link-dark">Create account</summary>
+                    <form class="form-card" style="min-width:250px;margin-top:.75rem" action="/system-admin/college-admins" method="post">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+                      <input type="hidden" name="college_id" value="<%= college.id %>">
+                      <label>School ID *</label><input name="school_id" maxlength="30" required>
+                      <label>Full name *</label><input name="full_name" maxlength="150" required>
+                      <label>CSPC email *</label><input type="email" name="email" placeholder="name@cspc.edu.ph" required>
+                      <button class="primary" type="submit">Create College Administrator</button>
+                    </form>
+                  </details>
+                <% } else { %>
+                  <details>
+                    <summary class="button-link-dark">Manage</summary>
+                    <form class="form-card" style="min-width:250px;margin-top:.75rem" action="/system-admin/college-admins/<%= college.administrator_id %>/update" method="post">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+                      <label>Assigned college *</label>
+                      <select name="college_id" required>
+                        <% colleges.forEach(option => { %><option value="<%= option.id %>" <%= option.id === college.id ? 'selected' : '' %> <%= option.administrator_id && option.id !== college.id ? 'disabled' : '' %>><%= option.code %></option><% }) %>
+                      </select>
+                      <label>Full name *</label><input name="full_name" maxlength="150" value="<%= college.full_name %>" required>
+                      <label>CSPC email *</label><input type="email" name="email" value="<%= college.email %>" required>
+                      <button class="primary" type="submit">Save details</button>
+                    </form>
+                    <form action="/system-admin/college-admins/<%= college.administrator_id %>/status" method="post" style="margin-top:.5rem">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+                      <input type="hidden" name="status" value="<%= college.administrator_status === 'Active' ? 'Inactive' : 'Active' %>">
+                      <button class="danger-outline" type="submit" onclick="return confirm('Change this administrator account status?')"><%= college.administrator_status === 'Active' ? 'Deactivate' : 'Reactivate' %></button>
+                    </form>
+                    <form action="/system-admin/college-admins/<%= college.administrator_id %>/reset-password" method="post" style="margin-top:.5rem" onsubmit="return confirm('Generate a new temporary password? The current password will stop working.');">
+                      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+                      <button class="danger-outline" type="submit">Reset password</button>
+                    </form>
+                  </details>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2>Access boundaries</h2>
+    <ul>
+      <li>The System Administrator manages College Administrator accounts across all colleges.</li>
+      <li>Each College Administrator can access only their assigned college's administration area.</li>
+      <li>College Administrators cannot create, edit, deactivate, or reset other administrator accounts.</li>
+      <li>Creation, profile changes, status changes, and password resets are recorded in the audit log.</li>
+      <li>New and reset passwords are temporary and require a change at next login.</li>
+    </ul>
+  </div>
+</div>
+</div>

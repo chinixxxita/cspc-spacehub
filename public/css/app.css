@@ -525,11 +525,11 @@ a.calendar-event:hover { filter: brightness(.96); }
 .login-register { margin: 20px 0 0; font-size: var(--text-sm); }
 .register-form .field-hint { margin: 6px 0 0; }
 
-/* Login / register over campus photo */
+/* Login / register use the same campus background and overlay as the landing hero. */
 .public-main.auth-page {
   background:
-    linear-gradient(115deg, rgba(8, 29, 61, .82), rgba(8, 36, 69, .6)),
-    var(--navy-900) url("/images/cspc-campus-bg.jpg") center / cover no-repeat fixed;
+    linear-gradient(100deg, rgba(5, 24, 44, .94) 0%, rgba(8, 36, 72, .78) 50%, rgba(37, 99, 201, .35) 100%),
+    var(--navy-900) url("/images/cspc-campus-bg.png") center 46% / cover no-repeat fixed;
 }
 
 .terms-card { width: min(820px, 100%); border-top-color: var(--gold-500); }
@@ -1160,7 +1160,7 @@ body { background: var(--canvas); }
 /* Public pages */
 .landing-hero .hero-overlay { background: linear-gradient(100deg, rgba(5, 24, 44, .94) 0%, rgba(8, 36, 72, .78) 50%, rgba(37, 99, 201, .35) 100%); }
 .hero-content h1 em { background: linear-gradient(100deg, #ffd27a, #f4b942 55%, #ff9f5a); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
-.public-main.auth-page { background: linear-gradient(115deg, rgba(8, 29, 61, .88), rgba(37, 99, 201, .45)), var(--navy-900) url("/images/cspc-campus-bg.jpg") center / cover no-repeat fixed; }
+.public-main.auth-page { background: linear-gradient(100deg, rgba(5, 24, 44, .94) 0%, rgba(8, 36, 72, .78) 50%, rgba(37, 99, 201, .35) 100%), var(--navy-900) url("/images/cspc-campus-bg.png") center 46% / cover no-repeat fixed; }
 .error-page h1 { background: var(--grad-brand); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
 
 /* Fallbacks: if background-clip text isn't supported keep solid, readable text */
@@ -1986,3 +1986,160 @@ a.calendar-event:hover { filter: brightness(.98); text-decoration: none; }
 
 /* Landing page must scroll to the workflow section and footer */
 .public-main.landing-main { height: auto; min-height: 100vh; overflow: visible; }
+
+
+/* System Administrator dashboard: icon, page heading and college table */
+.sidebar nav a[href="/system-admin"] {
+  --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 2.8 19 5.5v5.7c0 4.5-2.8 8-7 10-4.2-2-7-5.5-7-10V5.5l7-2.7Z'/%3E%3Cpath d='M9.2 12.1a2.8 2.8 0 1 1 5.6 0 2.8 2.8 0 0 1-5.6 0Z'/%3E%3Cpath d='M7.7 17c.8-1.5 2.3-2.3 4.3-2.3s3.5.8 4.3 2.3'/%3E%3C/svg%3E");
+}
+
+.system-admin-page {
+  width: 100%;
+  max-width: 1480px;
+  min-width: 0;
+  margin: 0 auto;
+  padding-top: 18px;
+}
+.system-admin-page > .page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+  margin: 0 0 24px;
+  padding: 0;
+}
+.system-admin-page > .page-header h1 {
+  margin: 0;
+  font-size: clamp(24px, 2.2vw, 30px);
+  line-height: 1.2;
+  color: var(--navy-900);
+  -webkit-text-fill-color: currentColor;
+}
+.system-admin-page > .page-header .eyebrow {
+  margin: 0 0 7px;
+}
+.system-admin-page > .page-header p.muted {
+  margin: 8px 0 0;
+  max-width: 760px;
+  line-height: 1.55;
+}
+.system-admin-page > .card {
+  width: 100%;
+  min-width: 0;
+  margin-bottom: 20px !important;
+  padding: 24px;
+}
+.system-admin-page .card-body {
+  min-width: 0;
+  padding: 0;
+}
+.system-admin-page .card-body > h2 {
+  margin: 0 0 8px;
+  font-size: 19px;
+  line-height: 1.35;
+}
+.system-admin-page .card-body > p.muted {
+  margin: 0 0 16px;
+  max-width: 100%;
+  line-height: 1.55;
+}
+.system-admin-table-wrap {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+.system-admin-page table.system-admin-table {
+  width: 100%;
+  min-width: 760px;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+.system-admin-page .system-admin-table th {
+  padding: 13px 16px;
+  text-align: left;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  color: #52627a;
+  background: #f3f6fb;
+  border-bottom: 1px solid var(--line);
+}
+.system-admin-page .system-admin-table th:nth-child(1) { width: 29%; }
+.system-admin-page .system-admin-table th:nth-child(2) { width: 39%; }
+.system-admin-page .system-admin-table th:nth-child(3) { width: 15%; }
+.system-admin-page .system-admin-table th:nth-child(4) { width: 17%; }
+.system-admin-page .system-admin-table td {
+  padding: 15px 16px;
+  vertical-align: middle;
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ink-soft);
+  border-bottom: 1px solid var(--line-soft);
+  overflow-wrap: anywhere;
+}
+.system-admin-page .system-admin-table tbody tr:last-child td { border-bottom: 0; }
+.system-admin-page .system-admin-table tbody tr:hover td { background: #f8fbff; }
+.system-admin-page .system-admin-table td strong {
+  display: inline-block;
+  color: var(--navy-800);
+  font-weight: 700;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.system-admin-page .system-admin-table td small {
+  display: inline-block;
+  margin-top: 3px;
+  line-height: 1.45;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.system-admin-page .system-admin-table td:nth-child(3) { white-space: nowrap; }
+.system-admin-page .system-admin-table td:nth-child(4) { white-space: nowrap; }
+.system-admin-page .system-admin-table td details { position: relative; }
+.system-admin-page .system-admin-table td summary.button-link-dark {
+  display: inline-flex;
+  min-width: 88px;
+  min-height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border: 1px solid var(--blue-100);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy-800);
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.system-admin-page .system-admin-table td summary.button-link-dark::-webkit-details-marker { display: none; }
+.system-admin-page .system-admin-table td summary.button-link-dark:hover { background: var(--blue-50); }
+.system-admin-page .system-admin-table td details[open] > form {
+  position: relative;
+  z-index: 2;
+  width: min(300px, 78vw);
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 12px 30px rgba(16,42,86,.14);
+}
+.system-admin-page .system-admin-table td details[open] > form + form {
+  width: auto;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+}
+@media (max-width: 760px) {
+  .system-admin-page { padding-top: 10px; }
+  .system-admin-page > .page-header { margin-bottom: 18px; }
+  .system-admin-page > .card { padding: 18px; }
+  .system-admin-page .system-admin-table { min-width: 720px; }
+}
+

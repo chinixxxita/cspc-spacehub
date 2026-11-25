@@ -6,9 +6,9 @@ const { requireCollegeAdmin } = require("../middleware/college");
 
 const router = express.Router();
 router.use(requireAuth);
-// Administrators only ever see their own college's calendar (req.college is set here).
+// College Administrators only ever see their own college's calendar (req.college is set here).
 // Students and faculty see every college, with the college shown in each facility's name.
-router.use((req, res, next) => (req.session.user.role === "admin" ? requireCollegeAdmin(req, res, next) : next()));
+router.use((req, res, next) => (req.session.user.role === "college_admin" ? requireCollegeAdmin(req, res, next) : next()));
 
 function parseMonth(value) {
   if (!value || !/^\d{4}-\d{2}$/.test(value)) return null;
@@ -145,7 +145,7 @@ router.get("/", async (req, res, next) => {
       nextMonth: `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}`,
       rooms: roomList,
       activeRoom,
-      isAdminCalendar: req.session.user.role === "admin",
+      isAdminCalendar: req.session.user.role === "college_admin",
       currentUserId: req.session.user.id
     });
   } catch (err) {

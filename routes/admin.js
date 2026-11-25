@@ -17,7 +17,7 @@ const { toSvg } = require("../utils/qr");
 const { newToken, ensureRoomTokens } = require("../utils/roomTokens");
 
 const router = express.Router();
-const adminOnly = requireRole("admin");
+const adminOnly = requireRole("college_admin");
 
 // Every route below is limited to the administrator's own college (req.college).
 // Rule for this file: each query on rooms, reservations, maintenance, users or audit
@@ -525,9 +525,9 @@ router.post("/users/:id/status", async (req, res, next) => {
       return res.redirect("/admin/users");
     }
     const status = ["Active", "Inactive", "Pending"].includes(req.body.status) ? req.body.status : "Inactive";
-    const [target] = await db.execute(`SELECT id FROM users WHERE id=? AND college_id=? LIMIT 1`, [req.params.id, req.college.id]);
-    if (!target.length) {
-      req.flash("error", "User not found.");
+    const [target] = await db.execute(`SELECT id, role FROM users WHERE id=? AND college_id=? LIMIT 1`, [req.params.id, req.college.id]);
+    if (!target.length || ["admin", "college_admin", "system_admin"].includes(target[0].role)) {
+      req.flash("error", "User not found or this account is managed by the System Administrator.");
       return res.redirect("/admin/users");
     }
     await db.execute(`UPDATE users SET status=? WHERE id=? AND college_id=?`, [status, req.params.id, req.college.id]);
@@ -563,7 +563,7 @@ router.post("/users/:id/reset-password", async (req, res, next) => {
       return res.redirect("/admin/users");
     }
     const target = rows[0];
-    if (target.role === "admin") {
+    if (["admin", "college_admin", "system_admin"].includes(target.role)) {
       req.flash("error", "Administrator passwords cannot be reset from this page.");
       return res.redirect("/admin/users");
     }
@@ -591,70 +591,13 @@ router.post("/users/:id/reset-password", async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-// Administrator account management. Only an active admin can create another admin, and
-// only for their OWN college: a CCS admin can never create or see CEA admins.
-// (requireCollegeAdmin has already re-checked the actor against the database.)
-router.get("/admin-accounts", async (req, res, next) => {
-  try {
-    const [admins] = await db.execute(
-      "SELECT id, school_id, full_name, email, status, created_at FROM users WHERE role='admin' AND college_id=? ORDER BY created_at DESC",
-      [req.college.id]
-    );
-    res.render("admin/admin-accounts", { title: "Admin Account Management", admins });
-  } catch (err) { next(err); }
+// College administrators cannot create or manage administrator accounts.
+// Administrator provisioning is reserved for the System Administrator interface.
+router.get("/admin-accounts", (req, res) => {
+  return res.status(403).render("errors/403", { title: "Access Denied" });
 });
-
-router.post("/admin-accounts", async (req, res, next) => {
-  try {
-    const schoolId = String(req.body.school_id || "").trim();
-    const fullName = String(req.body.full_name || "").trim();
-    const email = String(req.body.email || "").trim().toLowerCase();
-    const password = String(req.body.password || "");
-    const validSchoolId = /^[A-Za-z0-9_-]{2,30}$/.test(schoolId);
-    const validEmail = isCspcEmail(email);
-    const strongPassword = password.length >= 12 && password.length <= 128 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /\d/.test(password) && /[^A-Za-z0-9]/.test(password);
-
-    if (!validSchoolId || fullName.length < 2 || fullName.length > 150 || !validEmail || !strongPassword) {
-      req.flash("error", "Check the form. Use a valid school ID, name and CSPC email (name@cspc.edu.ph). Password must be at least 12 characters and include uppercase, lowercase, number and symbol.");
-      return res.redirect("/admin/admin-accounts");
-    }
-
-    const [duplicates] = await db.execute("SELECT id FROM users WHERE school_id=? OR email=? LIMIT 1", [schoolId, email]);
-    if (duplicates.length) {
-      req.flash("error", "That school ID or email is already registered.");
-      return res.redirect("/admin/admin-accounts");
-    }
-
-    const passwordHash = await bcrypt.hash(password, 12);
-    const connection = await db.getConnection();
-    try {
-      await connection.beginTransaction();
-      const [result] = await connection.execute(
-        "INSERT INTO users (school_id, full_name, email, password_hash, role, status, college_id) VALUES (?, ?, ?, ?, 'admin', 'Active', ?)",
-        [schoolId, fullName, email, passwordHash, req.college.id]
-      );
-      await writeAudit(connection, {
-        userId: req.session.user.id,
-        action: "CREATE_ADMIN_ACCOUNT",
-        entityType: "user",
-        entityId: result.insertId,
-        details: `Created ${req.college.code} administrator account for school ID ${schoolId}`,
-        req,
-        collegeId: req.college.id
-      });
-      await connection.commit();
-    } catch (err) {
-      await connection.rollback();
-      if (err.code === "ER_DUP_ENTRY") {
-        req.flash("error", "That school ID or email is already registered.");
-        return res.redirect("/admin/admin-accounts");
-      }
-      throw err;
-    } finally { connection.release(); }
-
-    req.flash("success", `Administrator account created for ${fullName}. Give the new administrator their login details securely.`);
-    res.redirect("/admin/admin-accounts");
-  } catch (err) { next(err); }
+router.post("/admin-accounts", (req, res) => {
+  return res.status(403).render("errors/403", { title: "Access Denied" });
 });
 
 router.get("/reports", async (req, res, next) => {

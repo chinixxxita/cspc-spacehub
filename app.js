@@ -9,6 +9,7 @@ const MySQLStore = require("express-mysql-session")(session);
 
 const authRoutes = require("./routes/auth");
 const adminDashboardRoutes = require("./routes/adminDashboard");
+const systemAdminRoutes = require("./routes/systemAdmin");
 const dashboardRoutes = require("./routes/dashboard");
 const roomRoutes = require("./routes/rooms");
 const reservationRoutes = require("./routes/reservations");
@@ -250,6 +251,13 @@ app.get("/", async (req, res, next) => {
 });
 
 app.use("/", authRoutes);
+app.use((req, res, next) => {
+  if (req.path === "/system-admin") {
+    console.log("[APP ROUTER CHECK]", req.method, req.originalUrl);
+  }
+  next();
+});
+app.use("/", systemAdminRoutes);
 app.use("/", adminDashboardRoutes); // college-scoped admin dashboard; non-admins fall through
 app.use("/", dashboardRoutes);
 app.use("/rooms", roomRoutes);

@@ -102,6 +102,7 @@ router.post("/register", registrationLimiter, async (req, res, next) => {
     const email = String(req.body.email || "").trim().toLowerCase();
     const password = String(req.body.password || "");
     const confirmPassword = String(req.body.confirm_password || "");
+    // Public registration is an allowlist: administrator roles can never be self-selected.
     const role = req.body.role === "faculty" ? "faculty" : "student";
     const termsAccepted = req.body.terms_accepted === "on";
     const collegeId = String(req.body.college_id || "").trim();

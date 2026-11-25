@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/css/app.css?v=20261125-campus-landing">
+  <link rel="stylesheet" href="/css/app.css?v=20261125-system-admin-table-icon-fix">
 </head>
 <%
   const activePath = currentPath || '';
@@ -31,20 +31,24 @@
       <nav aria-label="Main navigation">
         <div class="nav-section">MAIN</div>
         <%- navItem('/dashboard', 'Dashboard', is('/dashboard')) %>
-        <% if (currentUser.role !== 'admin') { %>
+        <% if (!['admin', 'college_admin', 'system_admin'].includes(currentUser.role)) { %>
           <%- navItem('/reservations/new', 'Make Reservation', under('/reservations/new')) %>
           <%- navItem('/reservations/my', 'My Reservations', myReservationsActive) %>
         <% } %>
         <%- navItem('/rooms', 'Rooms &amp; Laboratories', under('/rooms')) %>
         <%- navItem('/calendar', 'Calendar', under('/calendar')) %>
 
-        <% if (currentUser.role === 'admin') { %>
+        <% if (currentUser.role === 'system_admin') { %>
+          <div class="nav-section">SYSTEM</div>
+          <%- navItem('/system-admin', 'System Administration', is('/system-admin')) %>
+        <% } %>
+
+        <% if (currentUser.role === 'college_admin') { %>
           <div class="nav-section">ADMINISTRATION<%= currentUser.college_code ? ' · ' + currentUser.college_code : '' %></div>
           <%- navItem('/admin/requests', 'Reservation Requests', under('/admin/requests')) %>
           <%- navItem('/admin/rooms', 'Manage Facilities', under('/admin/rooms')) %>
           <%- navItem('/admin/maintenance', 'Maintenance', under('/admin/maintenance')) %>
           <%- navItem('/admin/users', 'Manage Users', under('/admin/users')) %>
-          <%- navItem('/admin/admin-accounts', 'Admin Accounts', under('/admin/admin-accounts')) %>
           <%- navItem('/admin/reports', 'Reports', under('/admin/reports')) %>
           <%- navItem('/admin/audit', 'Audit Trail', under('/admin/audit')) %>
         <% } %>

@@ -46,7 +46,7 @@ router.post("/profile", requireAuth, async (req, res, next) => {
     // Students and faculty may correct their home college. An administrator's college is
     // what scopes their access, so it can never be changed from here.
     let college = null;
-    if (req.session.user.role !== "admin") {
+    if (!["admin", "college_admin", "system_admin"].includes(req.session.user.role)) {
       const [found] = await db.execute("SELECT id, code, name FROM colleges WHERE id = ? LIMIT 1", [Number(req.body.college_id) || 0]);
       if (!found.length) {
         req.flash("error", "Please select your college.");

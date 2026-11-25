@@ -23,7 +23,7 @@ CREATE TABLE users (
   full_name VARCHAR(150) NOT NULL,
   email VARCHAR(150) NOT NULL UNIQUE,
   password_hash VARCHAR(255) NOT NULL,
-  role ENUM('student', 'faculty', 'admin') NOT NULL DEFAULT 'student',
+  role ENUM('student', 'faculty', 'admin', 'college_admin', 'system_admin') NOT NULL DEFAULT 'student',
   status ENUM('Active', 'Inactive', 'Pending') NOT NULL DEFAULT 'Active',
   terms_accepted_at DATETIME NULL,
   must_change_password BOOLEAN NOT NULL DEFAULT FALSE,

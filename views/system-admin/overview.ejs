@@ -1,0 +1,63 @@
+<section>
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">CAMPUS-WIDE CONTROL</div>
+      <h1>Dashboard</h1>
+      <p>Welcome, <%= currentUser.full_name %>. Monitor CSPC SpaceHub across all colleges.</p>
+    </div>
+    <a class="primary" href="/system-admin">Manage Colleges</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat-card">
+      <span>Colleges</span>
+      <strong><%= colleges.total || 0 %></strong>
+    </div>
+    <div class="stat-card">
+      <span>College Administrators</span>
+      <strong><%= admins.total || 0 %></strong>
+    </div>
+    <div class="stat-card">
+      <span>Active Administrators</span>
+      <strong><%= admins.active || 0 %></strong>
+    </div>
+    <div class="stat-card">
+      <span>Students and Faculty</span>
+      <strong><%= users.total || 0 %></strong>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-heading">
+      <div>
+        <h2>Reservation Overview</h2>
+        <p>Campus-wide reservation activity.</p>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat-card">
+        <span>Total Reservations</span>
+        <strong><%= reservations.total || 0 %></strong>
+      </div>
+      <div class="stat-card">
+        <span>Pending</span>
+        <strong><%= reservations.pending || 0 %></strong>
+      </div>
+      <div class="stat-card">
+        <span>Approved</span>
+        <strong><%= reservations.approved || 0 %></strong>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-heading">
+      <div>
+        <h2>System Administration</h2>
+        <p>Manage the administrator accounts assigned to each college.</p>
+      </div>
+      <a href="/system-admin">Open Management</a>
+    </div>
+  </div>
+</section>

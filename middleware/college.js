@@ -1,14 +1,14 @@
 const db = require("../config/db");
 
-// Scopes an administrator to ONE college.
+// Scopes an College Administrator to ONE college.
 //
-// Runs after the role check. It re-reads the admin from the database on every request
+// Runs after the role check. It re-reads the College Administrator from the database on every request
 // (not from the session), so a demoted, deactivated or re-assigned admin loses access
 // immediately. On success:
-//   req.college = { id, code, name }   <- every admin query must filter by req.college.id
+//   req.college = { id, code, name }   <- every college-admin query must filter by req.college.id
 //   res.locals.adminCollege            <- for templates
 //
-// An admin with no college is refused (fail closed) instead of seeing everything.
+// A College Administrator with no college is refused (fail closed) instead of seeing everything.
 async function requireCollegeAdmin(req, res, next) {
   try {
     const [rows] = await db.execute(
@@ -19,7 +19,7 @@ async function requireCollegeAdmin(req, res, next) {
       [req.session.user.id]
     );
     const u = rows[0];
-    if (!u || u.role !== "admin" || u.status !== "Active") {
+    if (!u || u.role !== "college_admin" || u.status !== "Active") {
       return req.session.destroy(() => res.status(403).render("errors/403", { title: "Access Denied" }));
     }
     if (!u.college_id || !u.code) {

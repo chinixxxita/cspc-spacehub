@@ -6,9 +6,8 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "create-admin": "node scripts/create-admin.js",
     "test-email": "node scripts/test-email.js",
-    "create-college-admin": "node scripts/create-college-admin.js"
+    "create-system-admin": "node scripts/create-system-admin.js"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

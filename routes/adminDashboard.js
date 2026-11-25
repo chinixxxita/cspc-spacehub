@@ -4,12 +4,12 @@ const { requireCollegeAdmin } = require("../middleware/college");
 
 const router = express.Router();
 
-// College-scoped administrator dashboard. Mounted in app.js BEFORE routes/dashboard.js:
+// College-scoped College Administrator dashboard. Mounted in app.js BEFORE routes/dashboard.js:
 // admins are handled here (their own college's numbers only); everyone else falls
 // through (next) to the existing student/faculty dashboard.
 router.get("/dashboard", (req, res, next) => {
   const u = req.session.user;
-  if (!u || u.role !== "admin") return next();
+  if (!u || u.role !== "college_admin") return next();
 
   requireCollegeAdmin(req, res, async (err) => {
     if (err) return next(err);
