@@ -10,7 +10,8 @@
       <% if (all) { %><a class="button-link-dark" href="/admin/rooms">Back to Facilities</a><% } else { %><a class="button-link-dark" href="/admin/rooms/qr">All QR Codes</a><a class="button-link-dark" href="/admin/rooms">Back to Facilities</a><% } %>
     </div>
   </div>
-  <% if (!usingAppUrl) { %><div class="notice compact no-print">These codes point to the address you used to open this page. Set <code>APP_URL</code> to the site's real address (for example https://your-domain) before printing the final codes.</div><% } %>
+  <% if (qr.problem) { %><div class="notice compact no-print"><strong>Check the address before printing.</strong> <%= qr.problem %> Set <code>QR_BASE_URL</code> in <code>.env</code> to the site's permanent public address (for example <code>https://spacehub.your-school.edu.ph</code>), restart the app, then print. Currently using: <code><%= qr.base %></code> (from <%= qr.source %>).</div>
+  <% } else { %><div class="notice compact no-print">Codes point to <code><%= qr.base %></code>. If the site address ever changes, tokens stay valid: students can open <strong>Scan QR</strong> inside SpaceHub to check in with the old printed codes, or you can reprint.</div><% } %>
 
   <div class="qr-grid">
     <% items.forEach(item => { %>

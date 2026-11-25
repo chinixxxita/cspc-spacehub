@@ -450,15 +450,13 @@ router.post("/rooms/save", async (req, res, next) => {
 });
 
 // ---- Facility QR codes (printed and posted at each room/lab) ----
-function publicBase(req) {
-  return (process.env.APP_URL || `${req.protocol}://${req.get("host")}`).replace(/\/+$/, "");
-}
+const { qrBase } = require("../utils/publicUrl");
 async function qrItems(req, ids) {
   await ensureRoomTokens(db);
   const [rooms] = ids
     ? await db.execute(`SELECT id, name, type, building, floor, checkin_token FROM rooms WHERE college_id = ? AND id IN (${ids.map(() => "?").join(",")})`, [req.college.id, ...ids])
     : await db.execute("SELECT id, name, type, building, floor, checkin_token FROM rooms WHERE college_id = ? ORDER BY type, name", [req.college.id]);
-  const base = publicBase(req);
+  const { base } = qrBase(req);
   return rooms.map((room) => {
     const url = `${base}/checkin/${room.checkin_token}`;
     return { room, url, svg: toSvg(url) };
@@ -468,7 +466,7 @@ async function qrItems(req, ids) {
 router.get("/rooms/qr", async (req, res, next) => {
   try {
     const items = await qrItems(req, null);
-    res.render("admin/room-qr", { title: "Facility QR Codes", items, all: true, usingAppUrl: Boolean(process.env.APP_URL) });
+    res.render("admin/room-qr", { title: "Facility QR Codes", items, all: true, qr: qrBase(req) });
   } catch (err) { next(err); }
 });
 
@@ -478,7 +476,7 @@ router.get("/rooms/:id/qr", async (req, res, next) => {
     if (!Number.isInteger(id) || id <= 0) return res.status(404).render("errors/404", { title: "Facility Not Found" });
     const items = await qrItems(req, [id]);
     if (!items.length) return res.status(404).render("errors/404", { title: "Facility Not Found" });
-    res.render("admin/room-qr", { title: `QR Code: ${items[0].room.name}`, items, all: false, usingAppUrl: Boolean(process.env.APP_URL) });
+    res.render("admin/room-qr", { title: `QR Code: ${items[0].room.name}`, items, all: false, qr: qrBase(req) });
   } catch (err) { next(err); }
 });
 

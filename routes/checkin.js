@@ -33,6 +33,16 @@ async function gate(req, res, next) {
   } catch (err) { next(err); }
 }
 
+// In-app scanner: works with ANY SpaceHub QR code, including stickers printed with an
+// old domain, because only the token is used and the user is sent to THIS site.
+router.get("/", (req, res) => {
+  if (!req.session.user) {
+    req.flash("error", "Please log in to scan a facility QR code.");
+    return res.redirect("/login");
+  }
+  res.render("checkin/scanner", { title: "Scan Facility QR" });
+});
+
 router.get("/:token", gate, async (req, res, next) => {
   try {
     const now = nowParts();
