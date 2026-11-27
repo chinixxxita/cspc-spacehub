@@ -41,42 +41,71 @@
                   <span class="badge <%= college.administrator_status === 'Active' ? 'approved' : 'cancelled' %>"><%= college.administrator_status %></span>
                 <% } else { %><span class="muted">—</span><% } %>
               </td>
-              <td>
+              <td class="system-admin-actions">
                 <% if (!college.administrator_id) { %>
-                  <details>
-                    <summary class="button-link-dark">Create account</summary>
-                    <form class="form-card" style="min-width:250px;margin-top:.75rem" action="/system-admin/college-admins" method="post">
+                  <button class="button-link-dark" type="button" onclick="document.getElementById('create-admin-<%= college.id %>').showModal()">Create account</button>
+                  <dialog class="system-admin-dialog" id="create-admin-<%= college.id %>" aria-labelledby="create-admin-title-<%= college.id %>">
+                    <div class="system-admin-dialog-header">
+                      <div>
+                        <p class="eyebrow">COLLEGE ACCOUNT</p>
+                        <h2 id="create-admin-title-<%= college.id %>">Create College Administrator</h2>
+                        <p class="muted">Assign an administrator to <strong><%= college.code %></strong>.</p>
+                      </div>
+                      <button class="system-admin-dialog-close" type="button" aria-label="Close" onclick="this.closest('dialog').close()">×</button>
+                    </div>
+                    <form class="system-admin-modal-form" action="/system-admin/college-admins" method="post">
                       <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
                       <input type="hidden" name="college_id" value="<%= college.id %>">
-                      <label>School ID *</label><input name="school_id" maxlength="30" required>
-                      <label>Full name *</label><input name="full_name" maxlength="150" required>
-                      <label>CSPC email *</label><input type="email" name="email" placeholder="name@cspc.edu.ph" required>
-                      <button class="primary" type="submit">Create College Administrator</button>
+                      <label for="school-id-<%= college.id %>">School ID <span aria-hidden="true">*</span></label>
+                      <input id="school-id-<%= college.id %>" name="school_id" maxlength="30" autocomplete="off" required>
+                      <label for="full-name-<%= college.id %>">Full name <span aria-hidden="true">*</span></label>
+                      <input id="full-name-<%= college.id %>" name="full_name" maxlength="150" autocomplete="name" required>
+                      <label for="email-<%= college.id %>">CSPC email <span aria-hidden="true">*</span></label>
+                      <input id="email-<%= college.id %>" type="email" name="email" placeholder="name@cspc.edu.ph" autocomplete="email" required>
+                      <div class="system-admin-modal-actions">
+                        <button class="secondary" type="button" onclick="this.closest('dialog').close()">Cancel</button>
+                        <button class="primary" type="submit">Create account</button>
+                      </div>
                     </form>
-                  </details>
+                  </dialog>
                 <% } else { %>
-                  <details>
-                    <summary class="button-link-dark">Manage</summary>
-                    <form class="form-card" style="min-width:250px;margin-top:.75rem" action="/system-admin/college-admins/<%= college.administrator_id %>/update" method="post">
+                  <button class="button-link-dark" type="button" onclick="document.getElementById('manage-admin-<%= college.id %>').showModal()">Manage</button>
+                  <dialog class="system-admin-dialog" id="manage-admin-<%= college.id %>" aria-labelledby="manage-admin-title-<%= college.id %>">
+                    <div class="system-admin-dialog-header">
+                      <div>
+                        <p class="eyebrow">COLLEGE ACCOUNT</p>
+                        <h2 id="manage-admin-title-<%= college.id %>">Manage Administrator</h2>
+                        <p class="muted"><strong><%= college.code %></strong> · <%= college.full_name %></p>
+                      </div>
+                      <button class="system-admin-dialog-close" type="button" aria-label="Close" onclick="this.closest('dialog').close()">×</button>
+                    </div>
+                    <form class="system-admin-modal-form" action="/system-admin/college-admins/<%= college.administrator_id %>/update" method="post">
                       <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
-                      <label>Assigned college *</label>
-                      <select name="college_id" required>
+                      <label for="assigned-college-<%= college.id %>">Assigned college <span aria-hidden="true">*</span></label>
+                      <select id="assigned-college-<%= college.id %>" name="college_id" required>
                         <% colleges.forEach(option => { %><option value="<%= option.id %>" <%= option.id === college.id ? 'selected' : '' %> <%= option.administrator_id && option.id !== college.id ? 'disabled' : '' %>><%= option.code %></option><% }) %>
                       </select>
-                      <label>Full name *</label><input name="full_name" maxlength="150" value="<%= college.full_name %>" required>
-                      <label>CSPC email *</label><input type="email" name="email" value="<%= college.email %>" required>
-                      <button class="primary" type="submit">Save details</button>
+                      <label for="edit-name-<%= college.id %>">Full name <span aria-hidden="true">*</span></label>
+                      <input id="edit-name-<%= college.id %>" name="full_name" maxlength="150" value="<%= college.full_name %>" required>
+                      <label for="edit-email-<%= college.id %>">CSPC email <span aria-hidden="true">*</span></label>
+                      <input id="edit-email-<%= college.id %>" type="email" name="email" value="<%= college.email %>" required>
+                      <div class="system-admin-modal-actions">
+                        <button class="secondary" type="button" onclick="this.closest('dialog').close()">Cancel</button>
+                        <button class="primary" type="submit">Save changes</button>
+                      </div>
                     </form>
-                    <form action="/system-admin/college-admins/<%= college.administrator_id %>/status" method="post" style="margin-top:.5rem">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
-                      <input type="hidden" name="status" value="<%= college.administrator_status === 'Active' ? 'Inactive' : 'Active' %>">
-                      <button class="danger-outline" type="submit" onclick="return confirm('Change this administrator account status?')"><%= college.administrator_status === 'Active' ? 'Deactivate' : 'Reactivate' %></button>
-                    </form>
-                    <form action="/system-admin/college-admins/<%= college.administrator_id %>/reset-password" method="post" style="margin-top:.5rem" onsubmit="return confirm('Generate a new temporary password? The current password will stop working.');">
-                      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
-                      <button class="danger-outline" type="submit">Reset password</button>
-                    </form>
-                  </details>
+                    <div class="system-admin-account-actions">
+                      <form action="/system-admin/college-admins/<%= college.administrator_id %>/status" method="post">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+                        <input type="hidden" name="status" value="<%= college.administrator_status === 'Active' ? 'Inactive' : 'Active' %>">
+                        <button class="danger-outline" type="submit" onclick="return confirm('Change this administrator account status?')"><%= college.administrator_status === 'Active' ? 'Deactivate account' : 'Reactivate account' %></button>
+                      </form>
+                      <form action="/system-admin/college-admins/<%= college.administrator_id %>/reset-password" method="post" onsubmit="return confirm('Generate a new temporary password? The current password will stop working.');">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+                        <button class="danger-outline" type="submit">Reset password</button>
+                      </form>
+                    </div>
+                  </dialog>
                 <% } %>
               </td>
             </tr>
