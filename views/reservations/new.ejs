@@ -2,7 +2,7 @@
   <div class="page-heading">
     <div>
       <h1>Make a Reservation</h1>
-      <p>Select a college, facility, date, and time.</p>
+      <p>Select a building, facility, date, and time.</p>
     </div>
   </div>
 
@@ -12,18 +12,30 @@
 
   <form id="reservationForm" class="card form-card" action="/reservations/review" method="post"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
     <div class="section-title"><span class="step-number">1</span><div><strong>Facility</strong></div></div>
-    <label for="collegeSelect">College / Department *</label>
-    <select name="college_id" id="collegeSelect" required>
-      <option value="">Choose a college or department first</option>
-      <% colleges.forEach(college => { %>
-        <option value="<%= college.id %>" <%= String(selectedCollegeId || '') === String(college.id) ? 'selected' : '' %>><%= college.code %> — <%= college.name %><%= String(college.id) === String(currentUser.college_id || '') ? ' (your college)' : '' %></option>
-      <% }) %>
-    </select>
-    <p class="field-hint">Facilities will appear after you select the college or department responsible for them.</p>
+   <label for="collegeSelect">Building *</label>
+<select name="college_id" id="collegeSelect" required>
+  <option value="">Choose a building first</option>
+  <% colleges.forEach(college => {
+    const buildingNames = {
+      CCS: "CCS Building",
+      CEA: "Academic Building 1",
+      CAS: "Academic Building 3",
+      CTHBM: "Academic Building 2",
+      CHS: "Academic Building 2"
+    };
+    const buildingName = buildingNames[college.code] || college.name;
+  %>
+    <option value="<%= college.id %>"
+      <%= String(selectedCollegeId || '') === String(college.id) ? 'selected' : '' %>>
+      <%= buildingName %><%= String(college.id) === String(currentUser.college_id || '') ? ' (your building)' : '' %>
+    </option>
+  <% }) %>
+</select>
+<p class="field-hint">Facilities will appear after you select their building.</p>
 
     <label for="roomSelect">Facility *</label>
     <select name="room_id" id="roomSelect" required disabled>
-      <option value="">Select a college or department first</option>
+      <option value="">Select a building first</option>
       <% rooms.forEach(room=>{ const blocked=currentUser.role==='student'&&room.type==='Laboratory'; %>
         <option value="<%= room.id %>" data-college-id="<%= room.college_id %>" <%= String(form?.room_id || '') === String(room.id) ? 'selected' : '' %> <%= blocked?'disabled':'' %> data-type="<%= room.type %>" data-capacity="<%= room.capacity %>"><%= room.name %> — <%= room.type %> — Capacity <%= room.capacity %><%= blocked?' (Instructor Required)':'' %></option>
       <% }) %>
@@ -127,9 +139,10 @@
   const fi = document.getElementById('facilityInfo');
 
   let blocks = [];
-  let restored = false;
-  const initialStart = <%- JSON.stringify(form?.start_time || '') %>;
-  const initialEnd = <%- JSON.stringify(form?.end_time || '') %>;
+let restored = false;
+
+const initialStart = <%- JSON.stringify(typeof form !== 'undefined' ? (form?.start_time || '') : '') %>;
+const initialEnd = <%- JSON.stringify(typeof form !== 'undefined' ? (form?.end_time || '') : '') %>;
 
   const min = (t) => {
     if (!t) return NaN;

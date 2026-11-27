@@ -1,27 +1,42 @@
+
 <section class="scan-page">
-  <div class="page-heading"><div>
-    <div class="eyebrow">FACILITY CHECK-IN</div>
-    <h1>Scan Facility QR</h1>
-    <p>Scan the QR code posted at the room or laboratory to check in or out.</p>
-  </div></div>
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">FACILITY CHECK-IN</div>
+      <h1>Scan QR Code</h1>
+    </div>
+  </div>
 
   <div class="card scan-card" id="scanner-card" data-scanner>
     <div class="scanner-view" id="scanner-view" hidden>
       <video id="scanner-video" playsinline muted></video>
     </div>
-    <button class="primary full scan-button" type="button" id="scanner-start" hidden>Open Camera</button>
+
+    <button class="primary full scan-button" type="button" id="scanner-start" hidden>
+      Open Camera
+    </button>
     <p class="muted" id="scanner-status" role="status">Checking camera…</p>
   </div>
 
   <div class="card scan-card">
-    <h2>Enter the code manually</h2>
-    <p class="muted">Paste the link from the QR code (or the code itself). This works even if the code was printed with an older website address.</p>
+    <h2>Enter QR Code Token (Optional)</h2>
     <form id="scanner-form" novalidate>
-      <label for="scanner-input">QR link or code</label>
-      <input id="scanner-input" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="https://…/checkin/…">
-      <p class="error-text" id="scanner-error" role="alert" hidden>That doesn't look like a SpaceHub facility code.</p>
+      <label for="scanner-input">Facility QR code token</label>
+      <input
+        id="scanner-input"
+        type="text"
+        autocomplete="off"
+        autocapitalize="off"
+        spellcheck="false"
+        placeholder="Enter the 32-character QR token"
+      >
+      <p class="error-text" id="scanner-error" role="alert" hidden>
+        Invalid facility QR code token.
+      </p>
       <button class="primary full" type="submit">Continue</button>
     </form>
   </div>
 </section>
-<script src="/js/qr-scan.js?v=20261125-qr" defer></script>
+
+<script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+<script src="/js/qr-scan.js?v=20261127-qr2" defer></script>

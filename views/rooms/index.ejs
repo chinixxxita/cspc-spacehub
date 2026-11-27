@@ -2,29 +2,29 @@
   <div class="page-heading facilities-heading">
     <div>
       <h1>Rooms &amp; Laboratories</h1>
-      <p>Browse facilities by college, type, or capacity.</p>
+      <p>Browse facilities by Building , type, or capacity.</p>
     </div>
   </div>
 
   <div class="facility-toolbar card" role="search">
     <div class="facility-control facility-search-control">
       <label for="facilitySearch">Search</label>
-      <input id="facilitySearch" type="search" placeholder="Facility, building, or college" autocomplete="off">
+      <input id="facilitySearch" type="search" placeholder="Facility, building" autocomplete="off">
     </div>
     <div class="facility-control">
-      <label for="collegeFilter">College / Department</label>
-      <select id="collegeFilter">
-        <option value="all">All colleges</option>
-        <% [...new Map(rooms.map(r => [r.college_code, r.college_name])).entries()].sort((a,b) => a[0].localeCompare(b[0])).forEach(([code, name]) => { %>
-          <option value="<%= code %>"><%= code %> — <%= name %></option>
-        <% }) %>
-      </select>
-    </div>
+  <label for="buildingFilter">Building</label>
+  <select id="buildingFilter">
+    <option value="all">All buildings</option>
+    <% [...new Set(rooms.map(r => r.building).filter(Boolean))].sort().forEach(building => { %>
+      <option value="<%= building %>"><%= building %></option>
+    <% }) %>
+  </select>
+</div>
     <div class="facility-control">
       <label for="facilitySort">Sort by</label>
       <select id="facilitySort">
         <option value="name">Facility name (A–Z)</option>
-        <option value="college">College (A–Z)</option>
+        <option value="building">Building (A–Z)</option>
         <option value="capacity-desc">Capacity (highest)</option>
         <option value="capacity-asc">Capacity (lowest)</option>
         <option value="type">Facility type</option>
@@ -40,17 +40,19 @@
   <div class="room-grid facilities-grid" id="facilityGrid">
     <% rooms.forEach(room => { %>
       <article class="room-card facility-card"
-        data-college="<%= room.college_code %>"
-        data-search="<%= `${room.name} ${room.type} ${room.building || ''} ${room.college_name} ${room.college_code}`.toLowerCase() %>"
-        data-name="<%= room.name %>"
-        data-college-name="<%= room.college_name %>"
+        data-building="<%= room.building || '' %>"
+data-search="<%= `${room.name} ${room.type} ${room.building || ''}`.toLowerCase() %>"
+data-name="<%= room.name %>"
+data-building-name="<%= room.building || '' %>"
         data-type="<%= room.type %>"
         data-capacity="<%= Number(room.capacity) || 0 %>">
         <div class="facility-card-top">
           <span class="facility-type"><%= room.type %></span>
           <span class="badge <%= String(room.status || '').toLowerCase() %>"><%= room.status %></span>
         </div>
-        <div class="facility-college"><strong><%= room.college_code %></strong><span><%= room.college_name %></span></div>
+        <div class="facility-college">
+  <strong><%= room.building || 'Building not specified' %></strong>
+</div>
         <h2><%= room.name %></h2>
         <% if (room.description) { %><p><%= room.description %></p><% } %>
         <div class="room-meta">
@@ -58,7 +60,9 @@
           <span><%= room.air_conditioned ? 'Air-conditioned' : 'No air conditioning' %></span>
           <span><%= room.has_computers ? `${room.computer_count} computers` : 'No computers listed' %></span>
         </div>
-        <div class="facility-location"><%= room.building || 'Building not specified' %><%= room.floor ? ` · Floor ${room.floor}` : '' %></div>
+        <% if (room.floor) { %>
+  <div class="facility-location">Floor <%= room.floor %></div>
+<% } %>
       </article>
     <% }) %>
   </div>
@@ -75,7 +79,7 @@
 <script>
 (() => {
   const search = document.getElementById('facilitySearch');
-  const college = document.getElementById('collegeFilter');
+  const building = document.getElementById('buildingFilter');
   const sort = document.getElementById('facilitySort');
   const grid = document.getElementById('facilityGrid');
   const cards = [...grid.querySelectorAll('.facility-card')];
@@ -93,12 +97,12 @@
   function update() {
     const term = search.value.trim().toLocaleLowerCase();
     filtered = cards.filter(card =>
-      (college.value === 'all' || card.dataset.college === college.value) &&
+      (building.value === 'all' || card.dataset.building === building.value) &&
       (!term || card.dataset.search.includes(term))
     );
 
     switch (sort.value) {
-      case 'college': filtered.sort((a,b) => compare(a,b,'collegeName') || compare(a,b,'name')); break;
+      case 'building': filtered.sort((a,b) => compare(a,b,'buildingName') || compare(a,b,'name')); break;
       case 'capacity-desc': filtered.sort((a,b) => Number(b.dataset.capacity) - Number(a.dataset.capacity) || compare(a,b,'name')); break;
       case 'capacity-asc': filtered.sort((a,b) => Number(a.dataset.capacity) - Number(b.dataset.capacity) || compare(a,b,'name')); break;
       case 'type': filtered.sort((a,b) => compare(a,b,'type') || compare(a,b,'name')); break;
@@ -124,7 +128,7 @@
   }
 
   search.addEventListener('input', () => { page = 1; update(); });
-  college.addEventListener('change', () => { page = 1; update(); });
+  building.addEventListener('change', () => { page = 1; update(); });
   sort.addEventListener('change', () => { page = 1; update(); });
   previous.addEventListener('click', () => { if (page > 1) { page--; update(); } });
   next.addEventListener('click', () => { page++; update(); });

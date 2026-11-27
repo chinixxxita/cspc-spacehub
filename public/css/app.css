@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CSPC SpaceHub — Design System
+   CSPC SpaceHub â€” Design System
    Single stylesheet. Tokens first, then base, components, layout, pages.
    No !important overrides: every rule is written once, in one place.
    ========================================================================== */
@@ -2145,7 +2145,7 @@ a.calendar-event:hover { filter: brightness(.98); text-decoration: none; }
 
 
 /* ==========================================================================
-   27. SpaceHub UX refresh — November 2026
+   27. SpaceHub UX refresh â€” November 2026
    Focus: clearer hierarchy, calmer surfaces, stronger interaction states,
    and predictable responsive behavior. Existing routes and workflows remain.
    ========================================================================== */
@@ -2568,3 +2568,203 @@ button:disabled, .primary:disabled, .secondary:disabled { box-shadow: none; }
 .sidebar nav a[href="/checkin"] { --ico: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M3 7V5a2 2 0 0 1 2-2h2M17 3h2a2 2 0 0 1 2 2v2M21 17v2a2 2 0 0 1-2 2h-2M7 21H5a2 2 0 0 1-2-2v-2'/%3E%3Cpath d='M7 12h10'/%3E%3C/svg%3E"); }
 .scanner-view { overflow: hidden; border-radius: 12px; background: #000; margin-bottom: 12px; aspect-ratio: 4 / 3; }
 .scanner-view video { display: block; width: 100%; height: 100%; object-fit: cover; }
+
+/* Remove colored accent strips from cards across all pages */
+.stat-card::before,
+.form-card::before,
+.calendar-card::before,
+.card.has-accent::before {
+  display: none !important;
+  content: none !important;
+}
+
+
+/* Calendar: balanced desktop sizing */
+@media (min-width: 761px) {
+  .calendar-cell {
+    min-height: 100px;
+    padding: 7px;
+  }
+
+  .calendar-weekdays > div {
+    padding: 8px 5px;
+  }
+
+  .calendar-toolbar {
+    padding: 14px 20px;
+  }
+
+  .calendar-legend {
+    padding: 10px 20px;
+    gap: 14px;
+  }
+
+  .calendar-events {
+    gap: 3px;
+  }
+
+  .calendar-event {
+    padding: 4px 6px;
+  }
+}
+
+/* Scan QR page layout */
+.scan-page {
+  max-width: 620px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.scan-page .page-heading {
+  margin-bottom: 0;
+  text-align: center;
+  justify-content: center;
+}
+
+.scan-page .scan-card {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+}
+
+.scan-page .scanner-view {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 12px;
+  aspect-ratio: 4 / 3;
+}
+
+.scan-page .scan-button {
+  max-width: 320px;
+  margin: 12px auto 0;
+}
+
+.scan-page #scanner-status {
+  margin: 10px 0 0;
+  font-size: 13px;
+}
+
+.scan-page .manual-scan-card h2 {
+  margin: 0 0 14px;
+}
+
+.scan-page .manual-scan-card form {
+  text-align: left;
+}
+
+.scan-page .manual-scan-card button {
+  margin-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .scan-page .scan-card {
+    padding: 16px;
+  }
+}
+
+
+/* Final Scan QR layout adjustments */
+.scan-page {
+  width: 100% !important;
+  max-width: 680px !important;
+  margin: 0 auto !important;
+  gap: 14px !important;
+}
+
+.scan-page [hidden] {
+  display: none !important;
+}
+
+.scan-page .scan-card {
+  width: 100% !important;
+  padding: 18px 22px !important;
+}
+
+.scan-page .scanner-view {
+  max-width: 420px;
+}
+
+.scan-page #scanner-status {
+  margin: 8px 0 0 !important;
+  font-size: 12px;
+}
+
+.scan-page .scan-button {
+  margin: 0 auto !important;
+}
+
+.scan-page .manual-scan-card h2 {
+  margin-bottom: 12px;
+}
+
+.scan-page .manual-scan-card input {
+  margin-bottom: 0;
+}
+
+/* Match Scan QR alignment with other pages */
+.scan-page {
+  max-width: 100% !important;
+  margin: 0 !important;
+}
+
+.scan-page .page-heading {
+  text-align: left !important;
+  justify-content: flex-start !important;
+}
+
+.scan-page .scan-card {
+  width: 100% !important;
+}
+/* Compact Rooms & Laboratories cards */
+.facilities-grid {
+  gap: 16px;
+}
+
+.facilities-grid .facility-card {
+  padding: 17px;
+}
+
+.facilities-grid .facility-college {
+  margin-top: 12px;
+  gap: 2px;
+}
+
+.facilities-grid .facility-card h2 {
+  font-size: 16px;
+  margin: 8px 0 6px;
+  line-height: 1.3;
+}
+
+.facilities-grid .facility-card > p {
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 4px 0;
+}
+
+.facilities-grid .facility-card .room-meta {
+  gap: 6px 10px;
+  margin-top: 11px;
+  padding-top: 10px;
+}
+
+.facilities-grid .facility-card .room-meta span {
+  font-size: 11px;
+}
+
+.facilities-grid .facility-location {
+  margin-top: 9px;
+  font-size: 11px;
+}
+/* Remove gold accent strips from Login and Landing cards */
+.public-main.auth-page .login-card {
+  border-top: 1px solid rgba(255, 255, 255, .55) !important;
+}
+
+.landing-page .availability-card {
+  border-top: 1px solid rgba(255, 255, 255, .55) !important;
+}
+

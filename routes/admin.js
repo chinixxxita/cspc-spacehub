@@ -19,6 +19,24 @@ const { newToken, ensureRoomTokens } = require("../utils/roomTokens");
 const router = express.Router();
 const adminOnly = requireRole("college_admin");
 
+const BUILDINGS_BY_COLLEGE = {
+  CCS: ["CCS Building", "Green Building"],
+  CEA: ["Academic Building 1", "Green Building"],
+  CAS: ["Academic Building 3", "Green Building"],
+  CTHBM: ["Academic Building 2", "Green Building"],
+  CHS: ["Academic Building 2", "Green Building"]
+};
+
+function getBuildingOptions(collegeCode, currentBuilding) {
+  const options = BUILDINGS_BY_COLLEGE[collegeCode] || ["Green Building"];
+
+  if (currentBuilding && !options.includes(currentBuilding)) {
+    return [...options, currentBuilding];
+  }
+
+  return options;
+}
+
 // Every route below is limited to the administrator's own college (req.college).
 // Rule for this file: each query on rooms, reservations, maintenance, users or audit
 // logs MUST filter by req.college.id, and each ":id" route must prove the record
@@ -402,12 +420,22 @@ router.get("/rooms", async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
-router.get("/rooms/new", (req, res) => res.render("admin/room-form", { title: "Add Facility", room: null }));
+router.get("/rooms/new", (req, res) => {
+  res.render("admin/room-form", {
+    title: "Add Facility",
+    room: null,
+    buildingOptions: getBuildingOptions(req.college.code)
+  });
+});
 router.get("/rooms/:id/edit", async (req, res, next) => {
   try {
     const [rows] = await db.execute(`SELECT * FROM rooms WHERE id=? AND college_id=? LIMIT 1`, [req.params.id, req.college.id]);
     if (!rows.length) return res.status(404).render("errors/404", { title: "Facility Not Found" });
-    res.render("admin/room-form", { title: "Edit Facility", room: rows[0] });
+    res.render("admin/room-form", {
+  title: "Edit Facility",
+  room: rows[0],
+  buildingOptions: getBuildingOptions(req.college.code, rows[0].building)
+});
   } catch (err) { next(err); }
 });
 
